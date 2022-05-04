@@ -5,6 +5,8 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 
 
 /**
@@ -33,5 +35,22 @@ public class ConditionalUntilSuccessfulOperations {
    */
   private String buildHelloMessage(String person) {
     return "Hello " + person + "!!!";
+  }
+
+  @MediaType(value = ANY, strict = false)
+  public void logDecorator(Chain operations, CompletionCallback<Object, Object> callback) {
+    //LOGGER.debug("Invoking child operations")
+    System.out.println("Invoking child operations");
+    operations.process(
+            result -> {
+              //LOGGER.debug(result.getOutput());
+              System.out.println(result.getOutput());
+              callback.success(result);
+            },
+            (error, previous) -> {
+              //LOGGER.error(error.getMessage());
+              System.out.println(error.getMessage());
+              callback.error(error);
+            });
   }
 }
