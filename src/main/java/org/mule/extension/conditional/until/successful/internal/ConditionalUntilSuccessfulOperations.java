@@ -37,6 +37,9 @@ public class ConditionalUntilSuccessfulOperations {
     return "Hello " + person + "!!!";
   }
 
+  /**
+   * Am I needed?
+   */
   @MediaType(value = ANY, strict = false)
   public void logDecorator(Chain operations, CompletionCallback<Object, Object> callback) {
     //LOGGER.debug("Invoking child operations")
@@ -52,5 +55,43 @@ public class ConditionalUntilSuccessfulOperations {
               System.out.println(error.getMessage());
               callback.error(error);
             });
+  }
+
+  /**
+   * My Custom *CONDITIONAL* Until Successful Scope
+   */
+  @MediaType(value = ANY, strict = false)
+  public void conditionalUntilSuccessful(Chain operations, CompletionCallback<Object, Object> callback) {
+    int maxRetries = 3;
+    final boolean[] shouldRetryFlag = {true};
+    final boolean[] totalSuccessFlag = {false};
+    int attemptCount = 1;
+    System.out.println("Invoking child operations");
+    while ((attemptCount <= (maxRetries + 1)) && (shouldRetryFlag[0]) && (!totalSuccessFlag[0])) {
+      System.out.println("Beginning attempt " + attemptCount);
+      int finalAttemptCount = attemptCount;
+      operations.process(
+              result -> {
+                //LOGGER.debug(result.getOutput());
+                //System.out.println(result.getOutput());
+                callback.success(result);
+                System.out.println("Attempt " + finalAttemptCount + " was a success. Should exit now.");
+                totalSuccessFlag[0] = true;
+                shouldRetryFlag[0] = false;
+              },
+              (error, previous) -> {
+                //LOGGER.error(error.getMessage());
+                //System.out.println(error.getMessage());
+                callback.error(error);
+                System.out.println("Attempt " + finalAttemptCount + " was a failure. Will analyse error to calculate if it should retry.");
+                if ("ERROR TYPE" != "CONNECTIVITY") {
+                  totalSuccessFlag[0] = true;
+                  shouldRetryFlag[0] = false;
+                }
+              });
+      System.out.println("Ending attempt " + attemptCount);
+      attemptCount ++;
+    }
+    System.out.println("Entire scope ending after attempt " + (attemptCount - 1));
   }
 }
