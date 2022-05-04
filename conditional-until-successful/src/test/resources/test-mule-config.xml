@@ -1,0 +1,19 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:conditional-until-successful="http://www.mulesoft.org/schema/mule/conditional-until-successful"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/conditional-until-successful http://www.mulesoft.org/schema/mule/conditional-until-successful/current/mule-conditional-until-successful.xsd">
+
+    <conditional-until-successful:config name="config" configId="configId">
+        <conditional-until-successful:connection requiredParameter="aValue" />
+    </conditional-until-successful:config>
+
+    <flow name="sayHiFlow">
+        <conditional-until-successful:say-hi person="Mariano Gonzalez"/>
+    </flow>
+
+    <flow name="retrieveInfoFlow">
+        <conditional-until-successful:retrieve-info config-ref="config"/>
+    </flow>
+
+</mule>
