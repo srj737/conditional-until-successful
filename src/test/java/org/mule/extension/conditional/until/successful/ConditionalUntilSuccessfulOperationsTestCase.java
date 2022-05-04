@@ -27,10 +27,29 @@ public class ConditionalUntilSuccessfulOperationsTestCase extends MuleArtifactFu
   @Test
   public void executeRetrieveInfoOperation() throws Exception {
     String payloadValue = ((String) flowRunner("retrieveInfoFlow")
-                                      .run()
-                                      .getMessage()
-                                      .getPayload()
-                                      .getValue());
+            .run()
+            .getMessage()
+            .getPayload()
+            .getValue());
     assertThat(payloadValue, is("Using Configuration [configId] with Connection id [aValue:100]"));
+  }
+
+  @Test
+  public void executeCUSSOperationSuccess() throws Exception {
+    String payloadValue = ((String) flowRunner("conditionalUntilSuccessfulFlowSuccess")
+            .run()
+            .getMessage()
+            .getPayload()
+            .getValue());
+    //assertThat(payloadValue, is("Using Configuration [configId] with Connection id [aValue:100]"));
+  }
+  @Test
+  public void executeCUSSOperationFail() throws Exception {
+    String payloadValue = ((String) flowRunner("conditionalUntilSuccessfulFlowFail")
+            .run()
+            .getMessage()
+            .getPayload()
+            .getValue());
+    //assertThat(payloadValue, is("Using Configuration [configId] with Connection id [aValue:100]"));
   }
 }

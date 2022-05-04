@@ -84,6 +84,9 @@ public class ConditionalUntilSuccessfulOperations {
                 //System.out.println(error.getMessage());
                 callback.error(error);
                 System.out.println("Attempt " + finalAttemptCount + " was a failure. Will analyse error to calculate if it should retry.");
+                System.out.println(error.getMessage());
+                //System.out.println(error.errorType);
+                System.out.println("ABOVE ME!");
                 if ("ERROR TYPE" != "CONNECTIVITY") {
                   totalSuccessFlag[0] = true;
                   shouldRetryFlag[0] = false;

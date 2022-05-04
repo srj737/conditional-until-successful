@@ -16,4 +16,16 @@
         <conditional-until-successful:retrieve-info config-ref="config"/>
     </flow>
 
+    <flow name="conditionalUntilSuccessfulFlowSuccess">
+        <conditional-until-successful:conditional-until-successful>
+            <logger level="INFO" message="HEY DW!!"/>
+        </conditional-until-successful:conditional-until-successful>
+    </flow>
+
+    <flow name="conditionalUntilSuccessfulFlowFail">
+        <conditional-until-successful:conditional-until-successful>
+            <logger level="INFO" message="#[HEY DW!!]"/>
+        </conditional-until-successful:conditional-until-successful>
+    </flow>
+
 </mule>
