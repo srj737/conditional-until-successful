@@ -8,6 +8,11 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * This class is a container for operations, every public method in this class will be taken as an extension operation.
@@ -63,11 +68,11 @@ public class ConditionalUntilSuccessfulOperations {
   @MediaType(value = ANY, strict = false)
   public void conditionalUntilSuccessful(Chain operations, CompletionCallback<Object, Object> callback) {
     int maxRetries = 3;
-    final boolean[] shouldRetryFlag = {true};
-    final boolean[] totalSuccessFlag = {false};
+    int timeToSleep = 10000;
+    final boolean[] willRetryFlag = {true};
     int attemptCount = 1;
     System.out.println("Invoking child operations");
-    while ((attemptCount <= (maxRetries + 1)) && (shouldRetryFlag[0]) && (!totalSuccessFlag[0])) {
+    while ((attemptCount <= (maxRetries + 1)) && willRetryFlag[0]) {
       System.out.println("Beginning attempt " + attemptCount);
       int finalAttemptCount = attemptCount;
       operations.process(
@@ -76,20 +81,24 @@ public class ConditionalUntilSuccessfulOperations {
                 //System.out.println(result.getOutput());
                 callback.success(result);
                 System.out.println("Attempt " + finalAttemptCount + " was a success. Should exit now.");
-                totalSuccessFlag[0] = true;
-                shouldRetryFlag[0] = false;
+                willRetryFlag[0] = false;
               },
               (error, previous) -> {
                 //LOGGER.error(error.getMessage());
                 //System.out.println(error.getMessage());
                 callback.error(error);
                 System.out.println("Attempt " + finalAttemptCount + " was a failure. Will analyse error to calculate if it should retry.");
-                System.out.println(error.getMessage());
-                //System.out.println(error.errorType);
-                System.out.println("ABOVE ME!");
-                if ("ERROR TYPE" != "CONNECTIVITY") {
-                  totalSuccessFlag[0] = true;
-                  shouldRetryFlag[0] = false;
+
+                //Regex: Finding errorType
+                String regex = "ErrorType: (\\w*:\\w*)";
+                String searchCase = error.toString();
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matcher = pattern.matcher(searchCase);
+                matcher.find();
+                String errorType = matcher.group(1);
+
+                if (!errorType.contains("CONNECTIVITY")) {
+                  willRetryFlag[0] = false;
                 }
               });
       System.out.println("Ending attempt " + attemptCount);

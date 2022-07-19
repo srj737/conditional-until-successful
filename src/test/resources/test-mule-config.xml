@@ -24,7 +24,7 @@
 
     <flow name="conditionalUntilSuccessfulFlowFail">
         <conditional-until-successful:conditional-until-successful>
-            <logger level="INFO" message="#[HEY DW!!]"/>
+            <raise-error type="HTTP:CONNECTIVITY"/>
         </conditional-until-successful:conditional-until-successful>
     </flow>
 
